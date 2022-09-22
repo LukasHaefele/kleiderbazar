@@ -1,0 +1,77 @@
+.greyout {
+  position: absolute;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  z-index: 5;
+  background-color: #00000099;
+}
+.greyout .panelButton {
+  width: 100px;
+  height: 20 px;
+  background-color: #D8DAE6ff;
+  border: 2px solid #000000ff;
+  border-radius: 5px;
+  margin: auto;
+  color: #000000ff;
+}
+.greyout .panIn {
+  width: 200px;
+  height: 25px;
+  background-color: #D8DAE6ff;
+  border: 2px solid #D8DAE6ff;
+  border-radius: 5px;
+  margin: auto;
+  color: #000000ff;
+}
+
+.panel {
+  display: none;
+  flex-direction: column;
+  flex-wrap: wrap;
+  overflow: scroll;
+  background-color: #E8EAF6ff;
+  padding: 5px;
+  border: 2px solid #000000ff;
+  box-shadow: 5px 5px 5px #0000009f;
+  border-radius: 10px;
+  text-align: center;
+  color: #000000ff;
+}
+
+.flexrow {
+  display: flex;
+  padding: 4px;
+  flex-direction: row;
+}
+
+.flexcol {
+  display: flex;
+  padding: 4px;
+  flex-direction: column;
+}
+
+.divide {
+  width: 3px;
+  background-color: black;
+}
+
+#adminUserEdit {
+  height: 85%;
+  width: 700px;
+}
+
+#pageClosed {
+  height: 95%;
+  width: 95%;
+}
+#pageClosed #closedP {
+  height: 30%;
+  width: 30%;
+  margin: auto;
+  justify-content: center;
+}
+
+/*# sourceMappingURL=panel.css.map */

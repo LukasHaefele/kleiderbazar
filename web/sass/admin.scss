@@ -1,0 +1,64 @@
+@import 'palette.scss';
+.admin{
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+
+  .adminPanel{
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    width: 49%;
+    height: 100%;
+    padding: 5px;
+  }
+  /*.panelButton{
+    width: 100px;
+    height: 20 px;
+    background-color: #3f3f3f;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin: auto;
+  }*/
+}
+.unconfirmed{             //object
+    padding: 3px;
+    border: 2px solid $color-b-border;
+    border-radius: 10px;
+    background-color: $color-o-back;
+}
+#usersToEdit{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: scroll;
+    justify-content: center;
+    width: 700px;
+    margin: 5px;
+    height: 85%;
+}
+.userInEdit{              //object
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 250px;
+    width: 200px;
+    border: 2px solid $color-b-border;
+    border-radius: 25px;
+    background-color: $color-o-back;
+    .tags{
+      color: $color-o-tags;
+    }
+    div{
+      margin: 8px;
+    }
+}
+#labelDiv{
+  width: 90%;
+  margin: auto;
+}
+#labels{
+  justify-content: center;
+  width: 90%;
+}

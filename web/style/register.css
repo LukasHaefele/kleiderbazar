@@ -1,0 +1,49 @@
+.register {
+  display: none;
+  height: 90%;
+  width: 100%;
+  z-index: 1;
+}
+.register #itemSearch {
+  width: 63%;
+  margin: 5px;
+  overflow: scroll;
+}
+.register #bill {
+  width: 30%;
+  margin: 5px;
+  overflow: scroll;
+}
+.register #bill #checkout {
+  height: 175px;
+  width: 200px;
+  margin: 10px auto auto auto;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.register #bill #checkout #given {
+  width: 80px;
+}
+.register .registerPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 15px;
+}
+.register .registerButton {
+  width: 100px;
+  height: 20 px;
+  background-color: #D8DAE6ff;
+  border: 2px solid #000000ff;
+  border-radius: 5px;
+  margin: auto;
+}
+.register #itemIdIn {
+  width: 100%;
+  height: 20px;
+  background-color: #D8DAE6ff;
+  border: 2px solid #000000ff;
+}
+
+/*# sourceMappingURL=register.css.map */

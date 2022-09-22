@@ -1,0 +1,69 @@
+.admin {
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  /*.panelButton{
+    width: 100px;
+    height: 20 px;
+    background-color: #3f3f3f;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin: auto;
+  }*/
+}
+.admin .adminPanel {
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+  width: 49%;
+  height: 100%;
+  padding: 5px;
+}
+
+.unconfirmed {
+  padding: 3px;
+  border: 2px solid #000000ff;
+  border-radius: 10px;
+  background-color: #C8CAD6ff;
+}
+
+#usersToEdit {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: scroll;
+  justify-content: center;
+  width: 700px;
+  margin: 5px;
+  height: 85%;
+}
+
+.userInEdit {
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+  width: 200px;
+  border: 2px solid #000000ff;
+  border-radius: 25px;
+  background-color: #C8CAD6ff;
+}
+.userInEdit .tags {
+  color: #000000ff;
+}
+.userInEdit div {
+  margin: 8px;
+}
+
+#labelDiv {
+  width: 90%;
+  margin: auto;
+}
+
+#labels {
+  justify-content: center;
+  width: 90%;
+}
+
+/*# sourceMappingURL=admin.css.map */

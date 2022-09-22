@@ -1,0 +1,70 @@
+@import 'palette.scss';
+.greyout{
+  position: absolute;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  z-index: 5;
+  background-color: $color-p-grey;
+  .panelButton{
+    width: 100px;
+    height: 20 px;
+    background-color: $color-p-in;
+    border: 2px solid $color-b-border;
+    border-radius: 5px;
+    margin: auto;
+    color: $color-b-text;
+  }
+  .panIn{
+    width: 200px;
+    height: 25px;
+    background-color: $color-p-in;
+    border: 2px solid $color-p-in;
+    border-radius: 5px;
+    margin: auto;
+    color: $color-b-text;
+  }
+}
+.panel{
+  display: none;
+  flex-direction: column;
+  flex-wrap: wrap;
+  overflow: scroll;
+  background-color: $color-p-back;
+  padding: 5px;
+  border: 2px solid $color-b-border;
+  box-shadow: 5px 5px 5px $color-h-shadow;
+  border-radius: 10px;
+  text-align: center;
+  color: $color-b-text;
+}
+.flexrow{
+  display: flex;
+  padding: 4px;
+  flex-direction: row;
+}
+.flexcol{
+  display: flex;
+  padding: 4px;
+  flex-direction: column;
+}
+.divide{
+  width: 3px;
+  background-color: black;
+}
+#adminUserEdit{
+  height: 85%;
+  width: 700px;
+}
+#pageClosed{
+  height: 95%;
+  width: 95%;
+  #closedP{
+    height: 30%;
+    width: 30%;
+    margin: auto;
+    justify-content: center;
+  }
+}

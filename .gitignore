@@ -1,0 +1,20 @@
+# Files and directories created by system.
+.dart_tool/
+.packages
+.vscode/
+.TODO
+
+# Conventional directory for build output.
+build/
+build_alt/
+
+# Data removed
+.data/*.json
+.data/.dataarchive/*
+.trash/copy/*
+web/label/print/*
+web/label/qr/*
+web/label/wholes/*
+web/label/emails.txt
+web/por/*
+web/receipts/*

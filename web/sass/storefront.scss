@@ -1,0 +1,124 @@
+@import 'palette.scss';
+.storefront{
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    overflow: scroll;
+
+    .itemButton{
+        margin: auto;
+        background-color: $color-r-in;
+        border: 2px solid $color-b-border;
+        border-radius: 7px;
+        width: 70px;
+        height: 25px;
+        text-align: center;
+    }
+    .modButton{
+        border: 2px solid $color-b-border;
+        background-color: $color-r-in;
+        border-radius: 7px;
+        height:  25px;
+        width: 25px;
+        text-align: center;
+    }
+    .etikette{
+        background-color: $color-r-in;
+        border: 2px solid $color-b-border;
+        border-radius: 7px;
+        width: 70px;
+        height: 25px;
+        text-align: center;
+    }
+}
+.itemDiv{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: 65%;
+    width: 100%;
+}
+.actionButton{
+    /*position: absolute;
+    bottom: 10px;
+    right: 10px;*/
+    width: 100px;
+    border: 2px solid $color-b-border;
+    background-color: $color-p-in;
+    border-radius: 10px;
+    z-index: 2;
+    text-align: center;
+    margin: auto auto auto 5px;
+}
+.buttonBar{
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: row;
+    z-index: 2;
+    justify-content: left;
+    align-items: flex-end;
+}
+.item{
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+    height: 150px;
+    margin: 20px;
+    justify-content: center;
+    align-items: center;
+    background-color: $color-i-back;
+    border: 2px solid $color-b-border;
+    border-radius: 10px;
+}
+#soldItemsPanel{
+    flex-direction: row;
+    width: 80%;
+    height: 80%;
+}
+#soldItems{
+    overflow: scroll;
+    flex-wrap: wrap;
+    justify-content: center;
+    .item{
+        background-color: $color-o-back;
+    }
+}
+#trashcan{
+    width: 80%;
+    height: 80%;
+}
+#trashItems{
+    overflow: scroll;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    .item{
+        background-color: $color-b-back;
+        justify-content: center;
+        align-items: center;
+    }
+}
+.size{
+    display: none;
+}
+.hintSymbol{
+    align-self: center;
+    justify-self: center;
+    margin: auto;
+}
+.hintOverlay{
+    position: fixed;
+    display: none;
+    background-color: $color-b-back;
+    box-shadow: 5px 5px 5px $color-h-shadow;
+    //border: 2px solid $color-b-border;
+    border-radius: 10px;
+    padding: 4px;
+}
+#hsize{
+    display: none;
+}

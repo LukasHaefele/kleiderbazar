@@ -1,0 +1,50 @@
+@import 'palette.scss';
+.register{
+  display: none;
+  height: 90%;
+  width: 100%;
+  z-index: 1;
+  #itemSearch{
+    width: 63%;
+    margin: 5px;
+    overflow: scroll;
+  }
+  #bill{
+    width: 30%;
+    margin: 5px;
+    overflow: scroll;
+
+    #checkout{
+      height: 175px;
+      width: 200px;
+      margin: 10px auto auto auto;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      #given{
+        width: 80px;
+      }
+    }
+  }
+  .registerPage{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 15px;
+    //border: 2px solid rgb(0, 0, 0);
+  }
+  .registerButton{
+    width: 100px;
+    height: 20 px;
+    background-color: $color-r-in;
+    border: 2px solid $color-b-border;
+    border-radius: 5px;
+    margin: auto;
+  }
+  #itemIdIn{
+    width: 100%;
+    height: 20px;
+    background-color: $color-r-in;
+    border: 2px solid $color-b-border;
+  }
+}

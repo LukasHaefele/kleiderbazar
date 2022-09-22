@@ -1,0 +1,284 @@
+    <!DOCTYPE html>
+
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="scaffolded-by" content="https://github.com/dart-lang/sdk">
+        <title>Kleiderbazar Gomaringen</title>
+        <link rel="stylesheet" href="style/base.css">
+        <script defer src="main.dart.js"></script>
+    </head>
+
+    <body>
+    <div class="header">
+        <button id="loginbutton">Login</button>
+        <div id="payout"></div>
+        <div id="ammountMarker"></div>
+        <button id="accountbutton"></button>
+    </div>
+    <div class="greyout">
+        <div class="panel" id="loginPanel">
+            <div class="flexrow">
+                <div class="flexcol">
+                <p>Nutzername:</p>
+                <p>Passwort:</p>
+                </div>
+                <div class="flexcol">
+                <input class="panIn" id="loginusername" type="text">
+                <input class="panIn" id="loginpassword" type="password">
+                </div>
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="loginButton">Login</button>
+                <button class="panelButton" id="registerButton">Registrieren</button>
+            </div>
+            <!--
+            <div class="flexrow">
+                <button class="panelButton" id="resetPassword">Passwort vergessen?</button>
+            </div>-->
+        </div>
+        <div class="panel" id="registerPanel">
+            <div class="flexrow">
+                <div class="flexcol">
+                <p>Nutzername: </p>
+                <p>Passwort: </p>
+                <p>Passwort wiederholen: </p>
+                <p>Vorname/Name: </p>
+                <p>E-Mail: </p>
+                </div>
+                <div class="flexcol">
+                    <input class="panIn" id="registeruname" type="text">
+                    <input class="panIn" id="registerpass" type="password">
+                    <input class="panIn" id="regsiterpassrep" type="password">
+                    <input class="panIn" id="registername" type="text">
+                    <input class="panIn" id="registeremail" type="email">
+                </div>
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="register">Registrieren</button>
+                <button class="panelButton" id="backToLogin">Login</button>
+            </div>
+        </div>
+        <div class="panel" id="uploadItem">
+            <div class="flexrow">
+                <div class="flexcol">
+                <p>Artikel: </p>
+                <p>Anzahl: </p>
+                <p>Art des Produkts: </p>
+                <p id="psize" class="size" >Größe: </p>
+                <p>Preis in Euro: </p>
+                </div>
+                <div class="flexcol">
+                    <input class="panIn" type="text" id="itemname">
+                    <input class="panIn" type="number" id="ammount">
+                    <select class="panIn" id="productType">
+                        <option value="">--Bitte wählen</option>
+                        <option value="0">Kleidung/Schuhe</option>
+                        <option value="1">Accessoires/Bücher/Spiele</option>
+                    </select>
+                    <input class="panIn size" type="text" id="size">
+                    <input class="panIn" type="number" id="price">
+                </div>
+                <div class="flexcol">
+                    <p class="hintSymbol"> </p>
+                    <p class="hintSymbol" id="aHint">?</p>
+                    <div class="hintOverlay" id="aText">Wenn du mehrere Artikel gleich auszeichnen möchtest, kannst du hier die Anzahl eintragen</div>
+                    <p class="hintSymbol" id="hsize"> </p>
+                    <p class="hintSymbol"> </p>
+                    <p class="hintSymbol"> </p>
+                </div>
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="itemUploadButton">Einstellen</button>
+                <button class="panelButton" id="exitButton">Abbrechen</button>
+            </div>
+        </div>
+        <div class="panel" id="soldItemsPanel">
+            <div class="flexrow" id="soldItems"></div>
+            <button class="panelButton" id="hideSold">Schließen</button>
+        </div>
+        <div class="panel" id="userAdminView">
+            <div class="flexrow" id="unconfirmed"></div>
+            <button class="panelButton" id="hideUserView">Schließen</button>
+        </div>
+        <div class="panel" id="adminVarEdit">
+            <div class="flexrow">
+                <div class="flexcol">
+                    <p>Spendenanteil: </p>
+                    <p>Komissionsgebühr: </p>
+                </div>
+                <div class="flexcol">
+                    <input class="panIn" id="comissionFee">
+                    <input class="panIn" id="donation">
+                </div>
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="saveVars">Speichern</button>
+                <button class="panelButton" id="closeVarEdit">Schließen</button>
+            </div>
+        </div>
+        <div class="panel" id="adminUserEdit">
+            <div class="flexcol" id="usersToEdit"></div>
+            <div class="flexrow">
+                <button class="panelButton" id="closeUserEdit">Schließen</button>
+                <button class="panelButton" id="archiveAll">Alle Archivieren</button>
+            </div>
+        </div>
+        <div class="panel" id="labels">
+            <div class="flexrow" id="labelDiv"></div>
+            <button class="panelButton" id="closeLabels">Schließen</button>
+        </div>
+        <div class="panel" id="archiveWarn">
+            <p>Diese Aktion wird alle Nutzer, Transaktionen und Waren in das Archiv verschieben. Wenn die Daten im Archiv sind können sie nicht ohne Hilfe eines Systemadministrator wiederhergestellt werden. Administrator Accounts bleiben bestehen. Wollen sie fortfahren?</p>
+            <button class="panelButton" id="archiveAllConfirmed">Alle Archivieren</button>
+            <button class="panelButton" id="exitArchiveAll">Abbrechen</button>
+        </div>
+        <div class="panel" id="qrScanner">
+            <div class="sep" id="qrSep">
+                <!--<canvas id="qrCanvas"></canvas>
+                <p id="qrP"></p>-->
+            </div>
+            <button class="panelButton" id="qrScanClose">Schließen</button>
+        </div>
+        <div class="panel" id="pageClosed">
+            <p id="closedP">
+                <!--Die Nummernvergabe für den Kleiderbazar Gomaringen beginnt am <div id="closedDate"></div> um <div id="closedTime"></div>.-->
+            </p>
+        </div>
+        <div class="panel" id="trashcan">
+            <p>Mülleimer</p>
+            <div class="flexcol" id="trashItems"></div>
+            <div class="flexrow">
+                <button class="panelButton" id="trashClose">Schließen</button>
+            </div>
+        </div>
+        <div class="panel" id="addCustomPanel">
+            <div class="flexrow">
+                <div class="flexcol">
+                    <p>Komissionsnummer: </p>
+                    <p>Waren ID: </p>
+                    <p>Preis: </p>
+                </div>
+                <div class="flexcol">
+                    <input class="panIn" id="customConum" type="text">
+                    <input class="panIn" id="customId" type="text">
+                    <input class="panIn" id="customPrice" type="number" step="0.01" min="0">
+                </div>
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="customSend">Hinzufügen</button>
+                <button class="panelButton" id="customClose">Schließen</button>
+            </div>
+        </div>
+        <div class="panel" id="tipPanel">
+            <div class="flexrow">
+                <p>Trinkgeld: </p>
+                <input class="panIn" id="tipIn" type="number" step="0.01" min="0">
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="sendTip">Abschicken</button>
+                <button class="panelButton" id="closeTip">Schließen</button>
+            </div>
+        </div>
+        <!--
+        <div class="panel" id="passwordRestore">
+            <p>Möchten sie bei einem Administrator einen Passwort Reset anfragen?</p>
+            <div class="flexrow">
+                <div class="flexcol">
+                    <p>E-Mail:</p>
+                    <p>Nutzername:</p>
+                    <p>Komissionsnummer:</p>
+                </div>
+                <div class="flexcol">
+                    <input class="panIn" id="restoreEmail" type="text">
+                    <input class="panIn" id="restoreUname" type="text">
+                    <input class="panIn" id="restoreConum" type="number">
+                </div>
+            </div>
+            <div class="flexrow">
+                <button class="panelButton" id="passwordRestoreConfirm">Ja</button>
+                <button class="panelButton" id="passwordRestoreClose">Nein</button>
+            </div>
+        </div>
+        -->
+    </div>
+    <div class="panel" id="error">
+        
+    </div>
+    <div class="welcome">
+        <p id="welcomeMessage">
+            Willkommen zur Nummernvergabe des Kinderkleiderbasar Gomaringen. Um dir einen Account zu erstellen klicke auf unten stehenden Registrierbutton. Hinweis: Bitte merke dir deine Anmeldedaten!
+        </p>
+        <button class="welcomeButton" id="welcomeRegister">Registrierung</button>
+    </div>
+    <div class="storefront">
+        <div class="buttonBar">
+            <button class="actionButton" id="soldButton">Verkaufte Ware</button>
+            <button class="actionButton" id="trashButton">Gelöschte Ware</button>
+            <a class="actionButton" id="allLabels">Alle Label herunterladen</a>
+        </div>
+        <button class="item" id="addItem">
+            Ware Hinzufügen
+        </button>
+        <div class="itemDiv">
+        </div> 
+    </div>
+    <div class="register">
+        <div class="registerPage" id="itemSearch">
+        <div class="flexrow" id="searchbar">
+            <input type="number" id="itemIdIn" placeholder="Waren ID..." autocomplete="off">
+        </div>
+        <div class="flexcol" id="searchres"></div>
+        </div>
+        <div class="divide"></div>
+        <div class="registerPage" id="bill">
+        <div class="flexcol" id="checkout">
+            <div class="flexrow">
+                <input type="number" id="given"> € bezahlt
+            </div>
+            <div id="change"></div>
+            <div class="flexrow" id="count">
+                <p id="amountItems">Anzahl: 0</p>
+            </div>
+            <div class="flexrow">
+                <button class="registerButton" id="checkoutButton">Checkout</button>
+                <p id="total">Total: 0.00€</p>
+            </div>
+            <div id="checkoutA"></div>
+        </div>
+        <div class="flexcol" id="billList">
+            <div id="placeHolderItem"></div>
+        </div>
+        </div>
+        <div class="buttonBar">
+            <button class="actionButton" id="qrScan">QR-Scanner öffnen</button>
+            <button class="actionButton" id="addCustom">Von Hand hinzufügen</button>
+            <button class="actionButton" id="openTip">Trinkgeld eingeben</button>
+        </div>
+    </div>
+    <div class="admin">
+        <div class="adminPanel" id="adminTr">
+        <p>Transaktionen:</p>
+        </div>
+        <div class="divide"></div>
+        <div class="adminPanel" id="adminUs">
+        <p>Nutzer:</p>
+        <div id="adminreceipt"></div>
+        </div>
+        <div class="buttonBar" id="adminButtonBar">
+            <button class="actionButton" id="getAllPOR">Alle Ausbezahlen</button>
+            <a class="actionButton" href="label/emails.txt" download="email-liste.txt">E-Mail Liste download</a>
+            <button class="actionButton" id="userView">Unbestätigte Nutzer</button>
+            <button class="actionButton" id="modVars">Variablen Ändern</button>
+            <button class="actionButton" id="userEdit">Nutzer Bearbeiten</button>
+            <button class="actionButton" id="lableManage">Etiketten Einsehen</button>
+        </div>
+    </div>
+    <div class="hintOverlay" id="logoHint">
+        Klicken um logo zu verstecken
+    </div>
+    <img class="logo" src="style/media/cvjm.jpg"></img>
+    </body>
+    </html>
