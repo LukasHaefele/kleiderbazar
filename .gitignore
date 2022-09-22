@@ -11,7 +11,7 @@ build_alt/
 # Data removed
 .data/*.json
 .data/.dataarchive/*.json
-.trash/copy/*
+.trash/copy/*.pdf
 web/label/print/*.pdf
 web/label/qr/*.png
 web/label/wholes/*.pdf
