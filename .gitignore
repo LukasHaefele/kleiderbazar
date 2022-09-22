@@ -10,11 +10,12 @@ build_alt/
 
 # Data removed
 .data/*.json
-.data/.dataarchive/*
+.data/.dataarchive/*.json
 .trash/copy/*
-web/label/print/*
-web/label/qr/*
-web/label/wholes/*
+web/label/print/*.pdf
+web/label/qr/*.png
+web/label/wholes/*.pdf
 web/label/emails.txt
-web/por/*
-web/receipts/*
+web/por/*txt
+web/por/whole.pdf
+web/receipts/*.txt
