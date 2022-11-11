@@ -134,7 +134,7 @@ void getAction(Map<String, dynamic> request, WebSocketChannel wsc) {
       return;
 
     case REGISTER_MARK:
-      registerMark(request['id'], wsc);
+      registerLookup(wsc, int.parse(request['id']), false);
       return;
 
     case REGISTER_UNMARK:

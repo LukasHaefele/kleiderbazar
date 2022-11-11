@@ -40,7 +40,7 @@ void adminGetAll(WebSocketChannel wsc) {
     wsc.sink.add(
         'admin_add_unconfirmed; id: $id; username: $username; name: $name; email: $email');
   }
-  for (Item i in allItems) {
+  for (Item i in items) {
     int id = i.id;
     String src = i.lablesrc;
     wsc.sink.add('admin_item_edit; id: $id; src: $src');
@@ -120,11 +120,14 @@ Future<String> makePayoutReceipt(User u) async {
       '\n' +
       sep;
   double hold = 0;
-  for (Item i in sold) {
+  for (Item i in items) {
     if (i.usrId == id) {
-      String s = i.name + ':\t' + i.price.toStringAsFixed(2) + '\t\t\tEuro\n';
-      write += s;
-      hold += i.price;
+      while (i.sold > 0) {
+        i.sold--;
+        String s = i.name + ':\t' + i.price.toStringAsFixed(2) + '\t\t\tEuro\n';
+        write += s;
+        hold += i.price;
+      }
     }
   }
   write += sep +
@@ -227,9 +230,9 @@ void adminDeleteUser(int id) {
   deleted.add(u);
   activeUsers.remove(u);
   updateEmailList();
-  for (Item i in allItems) {
+  for (Item i in items) {
     if (i.usrId == id) {
-      allItems.remove(i);
+      items.remove(i);
     }
   }
   stat['maximumUser']++;
@@ -281,10 +284,9 @@ void adminArchiveAll() async {
   //use.writeAsString('[]');
 
   deleted = getDeleted();
-  allItems = getItems('item');
+  items = getItems('item');
   allTr = getTr();
   freeUsers();
-  sold = getItems('sold');
   unconfirmed = getUnconfirmed();
   stat = getStat();
 }

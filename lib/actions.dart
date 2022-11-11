@@ -24,6 +24,7 @@ const ITEM_DELETE = 'item_delete';
 const ITEM_DELETE_ONE = 'item_delete_one';
 const ITEM_ADD_ONE = 'item_add_one';
 const ITEM_UNTRASH = 'item_untrash';
+const ITEM_UPDATE_TOTAL = 'item_update_total';
 
 const REGISTER_LOOKUP = 'register_lookup';
 const REGISTER_ITEM = 'register_item';

@@ -58,7 +58,8 @@ Except stat.json all files may simply be filled with an empty list "[]", stat.js
   "maxId":int,                                  //the maximum value the random generated userids can have
   "dLower":"yyyy-mm-dd hh:mm:ss",               //dates in between which the site is closed, lower is earlier,
   "dUpper":"yyyy-mm-dd hh:mm:ss",               //upper is later
-  "isseperated":bool                            //bool whether or not both types of item are counted seperate
+  "isseperated":bool,                           //bool whether or not both types of item are counted seperate
+  "maxes":[int, int]                            //Maximums for seperated counts
 }'
 
 To use the page you'll need to set a usable port in the bin/server.dart file as well as set the right url for the _webSocket in web/dart/websocket.dart .

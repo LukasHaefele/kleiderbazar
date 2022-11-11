@@ -64,7 +64,8 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
     case ITEM_UPDATE:
       addItemToStorefront(request['name'], request['price'],
           int.parse(request['ammount']), request['id'], request['lsrc'], ws);
-      querySelector('ammountMarker')?.text = 'Warenzahl: ' + request['ammount'];
+      querySelector('#ammountMarker')?.text =
+          'Warenzahl: ' + request['ammountTotal'];
       return;
 
     case ITEM_UPDATE_SOLD:
@@ -74,6 +75,11 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
     case ITEM_UPDATE_TRASHED:
       addTrashedToStoreFron(
           request['name'], request['price'], request['id'], ws);
+      return;
+
+    case ITEM_UPDATE_TOTAL:
+      querySelector('#ammountMarker')?.text =
+          'Warenzahl: ' + request['ammountTotal'];
       return;
 
     case REGISTER_ITEM:

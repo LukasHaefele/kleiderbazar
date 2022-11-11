@@ -79,8 +79,8 @@ void remakeWhole(int id, int conum) async {
 ///makes whole for first time
 pw.Document makeWhole(int id, int conum) {
   final whole = pw.Document();
-  for (Item i in allItems) {
-    if (i.usrId == id) {
+  for (Item i in items) {
+    if (i.usrId == id && (i.sold + i.trashed) < i.ammount) {
       String iname = i.name;
       String lableText = '\n$iname';
       String size = i.size;
@@ -93,7 +93,7 @@ pw.Document makeWhole(int id, int conum) {
       }
       lableText = lableText + '\n$pr Euro\n' + iid.toString() + '\n\n';
       final qrImage = pw.MemoryImage(File(qsrc).readAsBytesSync());
-      for (int j = 0; j < i.ammount; j++) {
+      for (int j = 0; j < (i.ammount - i.sold - i.trashed); j++) {
         whole.addPage(makePage(lableText, qrImage, conum));
       }
     }

@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:kleiderbazar/actions.dart';
 import 'package:kleiderbazar/admin.dart';
 import 'package:kleiderbazar/labelmngr.dart';
 import 'package:kleiderbazar/user.dart';
-import 'package:kleiderbazar/websockethandler.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 //import 'package:web_socket_channel/status.dart' as status;
 
@@ -38,8 +38,17 @@ class Item {
   ///Size in text format
   late String size;
 
+  ///Item is Sold
+  late int sold;
+
+  ///Item is trashed
+  late int trashed;
+
+  ///Item is marked
+  int marked = 0;
+
   Item(this.id, this.name, this.ammount, this.price, this.usrId, this.lablesrc,
-      this.productType, this.size);
+      this.productType, this.size, this.sold, this.trashed);
 }
 
 ///generates map to save item
@@ -52,30 +61,32 @@ Map itemToJson(Item i) {
     'usrId': i.usrId,
     'lablesrc': i.lablesrc,
     'productType': i.productType,
-    'size': i.size
+    'size': i.size,
+    'sold': i.sold,
+    'trashed': i.trashed
   };
 }
 
 ///generates item from map from json
 Item itemFromJson(Map m) {
   return Item(m['id'], m['name'], m['ammount'], m['price'], m['usrId'],
-      m['lablesrc'], m['productType'], m['size']);
+      m['lablesrc'], m['productType'], m['size'], m['sold'], m['trashed']);
 }
 
 ///List of all items
-List<Item> allItems = getItems('item');
+List<Item> items = getItems('item');
 
 ///List of sold items
-List<Item> sold = getItems('sold');
+//List<Item> sold = getItems('sold');
 
 ///List of trashed items
-List<Item> trashed = getItems('trashed');
+//List<Item> trashed = getItems('trashed');
 
 ///List of Items already in checkout
-List<Item> marked = [];
+//List<Item> marked = [];
 
 ///List of Items that couldn't be computed
-List<Item> uncomputed = getItems('unc');
+//List<Item> uncomputed = getItems('unc');
 
 ///generates items from saved json
 List<Item> getItems(String sw) {
@@ -89,45 +100,19 @@ List<Item> getItems(String sw) {
   for (var element in l) {
     r.add(itemFromJson(element));
   }
-
   return r;
 }
 
 ///saves items to json
 void saveItems(String sw) {
   List l = [];
-  List<Item> sa = [];
-  switch (sw) {
-    case 'item':
-      sa = allItems;
-      break;
-    case 'sold':
-      sa = sold;
-      break;
-    case 'trashed':
-      sa = trashed;
-      break;
-    case 'marked':
-      sa = marked;
-      break;
-    case 'unc':
-      sa = uncomputed;
-      break;
-  }
+  List<Item> sa = items;
 
   for (Item i in sa) {
     l.add(itemToJson(i));
   }
   File f = File('.data/$sw.json');
   f.writeAsStringSync(jsonEncode(l));
-}
-
-///saves all ItemLists
-void saveAllItems() {
-  saveItems('item');
-  saveItems('sold');
-  saveItems('trashed');
-  saveItems('marked');
 }
 
 ///saves new item and adds it to array
@@ -148,15 +133,16 @@ void addItem(String name, int ammount, String pr, int usrId, int productType,
   double price = double.parse(pr);
   int id = iid ?? getItemId();
   String lsrc = await generateLabel(id, name, price, size, usrId, ammount);
-  Item newItem = Item(id, name, ammount, price, usrId, lsrc, productType, size);
+  Item newItem =
+      Item(id, name, ammount, price, usrId, lsrc, productType, size, 0, 0);
 
   u.ammounts[productType] += ammount;
-  allItems.add(newItem);
+  items.add(newItem);
   saveItems('item');
   saveUsers();
   int am = u.fullAmmount();
   wsc.sink.add(
-      'item_update; name: $name; ammount: $ammount; price: $price; id: $id; lsrc: $lsrc; ammount: $am');
+      'item_update; name: $name; ammount: $ammount; price: $price; id: $id; lsrc: $lsrc; ammountTotal: $am');
 }
 
 bool checkAmmount(List ammounts, int ammount, int type) {
@@ -170,21 +156,21 @@ bool checkAmmount(List ammounts, int ammount, int type) {
 }
 
 bool isSeperated = stat['isseperated'];
-List maxes = [30, 50];
+List maxes = stat['maxes'];
 
 ///generates new id for new item
 int getItemId() {
   Random r = Random();
-  int id = r.nextInt(stat['maxId']);
+  int id = r.nextInt(999999);
   while (itemIdTaken(id)) {
-    id = r.nextInt(stat['maxId']);
+    id = r.nextInt(999999);
   }
   return id;
 }
 
 ///Checks if generated Item ID is already taken
 bool itemIdTaken(int id) {
-  for (Item i in allItems) {
+  for (Item i in items) {
     if (i.id == id) {
       return true;
     }
@@ -194,31 +180,23 @@ bool itemIdTaken(int id) {
 
 ///sends items found by id to user
 void sendItemsById(int id, WebSocketChannel wsc) {
-  for (Item i in allItems) {
+  for (Item i in items) {
     if (i.usrId == id) {
       String name = i.name;
-      int ammount = i.ammount;
+      int ammount = i.ammount - i.sold - i.trashed;
       double price = i.price;
       int iid = i.id;
       String lsrc = i.lablesrc;
-      wsc.sink.add(
-          'item_update; name: $name; ammount: $ammount; price: $price; id: $iid; lsrc: $lsrc');
-    }
-  }
-  for (Item i in sold) {
-    if (i.usrId == id) {
-      String name = i.name;
-      double price = i.price;
-      int iid = i.id;
-      wsc.sink.add('item_update_sold; name: $name; price: $price; id: $iid');
-    }
-  }
-  for (Item i in trashed) {
-    if (i.usrId == id) {
-      String name = i.name;
-      double price = i.price;
-      int iid = i.id;
-      wsc.sink.add('item_update_trashed; name: $name; price: $price; id: $iid');
+      if (i.sold >= i.ammount) {
+        wsc.sink.add('item_update_sold; name: $name; price: $price; id: $iid');
+      } else if (i.trashed >= i.ammount) {
+        wsc.sink
+            .add('item_update_trashed; name: $name; price: $price; id: $iid');
+      } else {
+        int at = getUserById(i.usrId).fullAmmount();
+        wsc.sink.add(
+            'item_update; name: $name; ammount: $ammount; price: $price; id: $iid; lsrc: $lsrc; ammountTotal: $at');
+      }
     }
   }
 }
@@ -251,7 +229,7 @@ void itemModByOne(int id, bool add, bool trash, WebSocketChannel wsc) {
       return r;
     }
   }*/
-  for (Item i in allItems) {
+  for (Item i in items) {
     if (i.id == id) {
       User u = getUserById(i.usrId);
       if (u == emptyUser) return;
@@ -264,7 +242,6 @@ void itemModByOne(int id, bool add, bool trash, WebSocketChannel wsc) {
           remakeWhole(u.id, u.conum);
         }
       } else {
-        i.ammount--;
         u.ammounts[i.productType]--;
         if (i.ammount <= 0) {
           removeItem(i.id, trash, wsc);
@@ -273,6 +250,7 @@ void itemModByOne(int id, bool add, bool trash, WebSocketChannel wsc) {
       }
       saveItems('item');
       saveUsers();
+      wsc.sink.add('$ITEM_UPDATE_TOTAL; ammountTotal: ${u.fullAmmount()}');
       return;
     }
   }
@@ -280,46 +258,24 @@ void itemModByOne(int id, bool add, bool trash, WebSocketChannel wsc) {
 
 ///removes an item from array and passes it back.
 ///Handles both checkout and delete.
-///If bool trash is set Item is moved to trashed list
-///else Item is moved to marked
+///If bool trash is set Item is marked as trashed
+///else Item is marked as marked
 Item? removeItem(int id, bool trash, WebSocketChannel wsc) {
-  /*for (Item i in marked) {
+  for (Item i in items) {
     if (i.id == id) {
-      getUserById(i.usrId)!.ammounts[i.productType] -= i.ammount;
-      saveUsers();
-      marked.remove(i);
-      saveItems('item');
-      //removeFile(File('web/label/print/$id.pdf'));
-      //removeFile(File('web/label/qr/$id.png'));
-
-      if (trash) remakeWhole(i.usrId, getUserById(i.usrId)!.conum);
-      return i;
-    }
-  }*/
-  List o = [];
-  List g = [];
-  if (trash) {
-    o = allItems;
-    g = trashed;
-  } else {
-    o = marked;
-    g = sold;
-  }
-  for (Item i in o) {
-    if (i.id == id) {
-      g.add(i);
-      o.remove(i);
       if (trash) {
-        String name = i.name;
-        double price = i.price;
-        int iid = i.id;
-        wsc.sink
-            .add('item_update_trashed; name: $name; price: $price; id: $iid');
+        i.trashed += i.ammount;
+        wsc.sink.add(
+            '$ITEM_UPDATE_TRASHED; name: ${i.name}; price: ${i.price}; id: ${i.id}');
+      } else {
+        i.sold++;
       }
-      getUserById(i.usrId).ammounts[i.productType] -= i.ammount;
+      User u = getUserById(i.usrId);
+      u.ammounts[i.productType] -= i.ammount;
+      wsc.sink.add('$ITEM_UPDATE_TOTAL; ammountTotal: ${u.fullAmmount()}');
+      wsc.sink.add('$ITEM_UPDATE_TOTAL; ammountTotal: ${u.fullAmmount()}');
+      saveItems('item');
       saveUsers();
-      saveAllItems();
-      return i;
     }
   }
   return null;
@@ -328,19 +284,13 @@ Item? removeItem(int id, bool trash, WebSocketChannel wsc) {
 ///restores Item from trash
 void itemUntrash(int id, WebSocketChannel wsc) {
   Item? ir;
-  for (Item i in trashed) {
+  for (Item i in items) {
     if (i.id == id) {
-      User u = getUserById(i.usrId);
-      if (u == emptyUser) return;
-      if (u.fullAmmount() + 1 >= stat['maxItem']) {
-        wsc.sink.add('overflow');
-      }
       ir = i;
-      trashed.remove(i);
       break;
     }
   }
-  Item it = ir ?? Item(-1, 'no', 0, 0, 0, '', 0, '');
+  Item it = ir ?? Item(-1, 'no', 0, 0, 0, '', 0, '', 0, 0);
   if (it.id != -1) {
     addItem(it.name, it.ammount, it.price.toString(), it.usrId, it.productType,
         it.size, wsc);
@@ -349,21 +299,23 @@ void itemUntrash(int id, WebSocketChannel wsc) {
 
 ///sends item to register frontend
 void registerLookup(WebSocketChannel wsc, int id, bool b) {
-  for (Item i in allItems) {
+  for (Item i in items) {
     /*String iid = i.id.toString();
     String iiid = id.toString();
     print('iid: $iid');
     print('iiid: $iiid');
     print(iid.contains(iiid));*/
-    if (i.id.toString().contains(id.toString())) {
-      Map m = itemToJson(i);
-      String s = jsonEncode(m);
-      if (b) {
+    if (b) {
+      if (i.id.toString().contains(id.toString())) {
+        Map m = itemToJson(i);
+        String s = jsonEncode(m);
         wsc.sink.add('register_item; item: $s');
-      } else {
-        if (i.id == id) {
-          wsc.sink.add('register_bill; item: $s');
-        }
+      }
+    } else {
+      if (i.id == id) {
+        i.marked++;
+        String s = jsonEncode(itemToJson(i));
+        wsc.sink.add('register_bill; item: $s');
       }
     }
   }
@@ -371,11 +323,13 @@ void registerLookup(WebSocketChannel wsc, int id, bool b) {
 
 ///Function for Lookup on scan:
 void registerScan(WebSocketChannel wsc, int id) {
-  for (Item i in allItems) {
+  for (Item i in items) {
     if (i.id == id) {
       Map m = itemToJson(i);
       String s = jsonEncode(m);
       wsc.sink.add('register_bill; item: $s');
+      i.marked++;
+      saveItems('item');
       return;
     }
   }
@@ -392,11 +346,10 @@ void registerCheckout(
   Tr t = addTr(tt);
   for (int id in l) {
     t.addItem(id);
-    Item i = getItemFromCheckout(id);
+    Item i = getItemById(id);
     if (i.id == -1) {
-      marked.add(i..id = id);
-      uncomputed.add(i);
-      saveItems('unc');
+      i.marked--;
+      i.sold++;
     }
     /*if (i.ammount == 1) {
       removeItem(id, false);
@@ -408,7 +361,7 @@ void registerCheckout(
           i.productType, i.size));
     }*/
     removeItem(id, false, wsc);
-    saveAllItems();
+    saveItems('item');
     saveTr();
   }
   Map m = await makeReceipt(t, double.parse(given));
@@ -450,96 +403,20 @@ Future<Map> makeReceipt(Tr t, double given) async {
 
 ///gets item by id from either sold, unsold, or marked
 Item getItemById(int id) {
-  /*for (Item i in sold) {
-    if (i.id == id) {
-      return i;
-    }
-  }*/
-  for (Item i in allItems) {
+  for (Item i in items) {
     if (i.id == id) {
       return i;
     }
   }
-  for (Item i in sold) {
-    if (i.id == id) {
-      return i;
-    }
-  }
-  for (Item i in marked) {
-    if (i.id == id) {
-      return i;
-    }
-  }
-  return Item(-1, 'Ware konnte nicht gefunden werden', 0, 0.0, 0, '', 0, '');
-}
-
-///Function to remember the Items already in checkout
-void registerMark(String id, WebSocketChannel wsc) {
-  for (Item i in allItems) {
-    if (i.id == int.parse(id)) {
-      /*marked.add(Item(i.id, i.name, 1, i.price, i.usrId, i.lablesrc,
-          i.productType, i.size));
-      if (i.ammount - 1 == 0) {
-        allItems.remove(i);
-      } else {
-        i.ammount--;
-      }*/
-      Item toMark = Item(
-          i.id, i.name, 1, i.price, i.usrId, i.lablesrc, i.productType, i.size);
-      marked.add(toMark);
-      saveItems('marked');
-      //itemModByOne(i.id, false, false, wsc);
-      i.ammount--;
-      if (i.ammount <= 0) {
-        allItems.remove(i);
-      }
-      watchFor(toMark, wsc);
-      saveItems('item');
-      return;
-    }
-  }
-  wsc.sink
-      .add('error; message: Die Ware $id muss von Hand abgerechnet werden.');
-  marked.add(Item(int.parse(id), '', 1, 0.0, 0, '', 0, ''));
-  saveItems('marked');
-}
-
-///function that remove Item from List if ws closes without it being removed
-void watchFor(Item i, WebSocketChannel wsc) async {
-  while (marked.contains(i)) {
-    if (!channelList[wsc]) {
-      registerUnmark(i.id.toString());
-      return;
-    }
-    await Future.delayed(Duration(seconds: 20));
-  }
+  return Item(
+      -1, 'Ware konnte nicht gefunden werden', 0, 0.0, 0, '', 0, '', 0, 0);
 }
 
 ///removes Item from checkout if removed in client
 void registerUnmark(String id) {
-  for (Item i in marked) {
-    if (i.id == int.parse(id)) {
-      Item li = getItemById(int.parse(id));
-      if (li.id == -1) {
-        allItems.add(i);
-      } else {
-        li.ammount++;
-      }
-      marked.remove(i);
-      saveItems('item');
-      return;
-    }
-  }
-}
-
-///returnsItem from checkout
-Item getItemFromCheckout(int id) {
-  for (Item i in marked) {
-    if (i.id == id) {
-      return i;
-    }
-  }
-  return Item(-1, 'Undefinierte Ware', 0, 0, 0, '', 0, '');
+  int iid = int.parse(id);
+  Item i = getItemById(iid);
+  if (i.marked > 0) i.marked--;
 }
 
 ///makes an Item for custom add
@@ -548,10 +425,11 @@ void makeCustom(int conum, int id, double price, WebSocketChannel wsc) {
   for (User u in allUsers) {
     if (u.conum == conum) uid = u.id;
   }
-  Item i = Item(id, id.toString(), 1, price, uid, '', 1, '');
-  allItems.add(i);
-  saveAllItems();
-  registerLookup(wsc, id, false);
+  Item i = Item(id, id.toString(), 1, price, uid, '', 1, '', 0, 0);
+  items.add(i);
+  saveItems('item');
+  String s = jsonEncode(itemToJson(i));
+  wsc.sink.add('register_bill; item: $s');
 }
 
 ///Function that remembers tips given by register

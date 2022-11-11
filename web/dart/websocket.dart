@@ -5,8 +5,8 @@ import 'actionhandler.dart';
 
 ///modified WebSocket Class
 class ClientWebSocket {
-  final WebSocket _webSocket = WebSocket('');
-  //final WebSocket _webSocket = WebSocket('ws://localhost:7070/ws');
+  //final WebSocket _webSocket = WebSocket('');
+  final WebSocket _webSocket = WebSocket('ws://localhost:7070/ws');
   void connect() async {
     messageStream.listen((data) async {
       getaction(parseData(data), this);
@@ -27,6 +27,7 @@ ClientWebSocket ws = ClientWebSocket();
 ///parses ws data to action Map
 Map<String, dynamic> parseData(String data) {
   Map<String, dynamic> r = {};
+  print(data);
 
   List<String> split;
   split = data.split('; ');
