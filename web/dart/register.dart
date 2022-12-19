@@ -109,7 +109,7 @@ void registerItem(Map m, ClientWebSocket ws) {
 void addToBill(Map m, ClientWebSocket ws) {
   ws.send('register_mark; id: ' + m['id'].toString());
   modNumber(numScanned + 1);
-  querySelector('#change')?.text = '';
+  //querySelector('#change')?.text = '';
   re.add(m['id']);
   DivElement newDiv = generateItem(m);
   newDiv.append(DivElement()

@@ -35,7 +35,7 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
     case LOGIN_SUCCESS:
       hidePanel('#loginPanel');
       loggedIn(request['username'], request['id'], request['payout'],
-          request['ammount'], ws);
+          request['ammount'], jsonDecode(request['byCred'] ?? 'false'), ws);
       return;
 
     case LOGIN_FAILURE:
@@ -120,6 +120,7 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
           jsonDecode(request['register']),
           jsonDecode(request['admin']),
           request['conum'],
+          jsonDecode(request['emp']),
           ws);
       return;
 
@@ -131,12 +132,20 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
       saveReceiptForAll();
       return;
 
+    case ADMIN_WAITLIST_ADD:
+      addWaiting(jsonDecode(request['pars']), ws);
+      return;
+
+    case ADMIN_WAITLIST_PRINT:
+      drawWaitList();
+      return;
+
     case PAGE_CLOSED:
       showPanel('#pageClosed');
       makeDt(request['dt']);
       return;
   }
-  window.console.warn('unhandeled action');
+  window.console.warn('unhandeled action $request');
 }
 
 ///List to remember something but I forgot what

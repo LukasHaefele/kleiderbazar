@@ -185,6 +185,18 @@ void getAction(Map<String, dynamic> request, WebSocketChannel wsc) {
     case ADMIN_PASSWORD_RESET:
       adminResetPassword(int.parse(request['id']), wsc);
       return;
+
+    case ADMIN_WAITLIST_UP:
+      waitlistUp(jsonDecode(request['index']));
+      return;
+
+    case ADMIN_WAITLIST_DOWN:
+      waitlistDown(jsonDecode(request['index']));
+      return;
+
+    case ADMIN_MAKE_EMP:
+      adminMakeEmp(jsonDecode(request['id']));
+      return;
   }
   print('unhandeled action');
 }

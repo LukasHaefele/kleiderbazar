@@ -93,10 +93,10 @@ List<Item> getItems(String sw) {
   List<Item> r = [];
   File f = File('.data/$sw.json');
   List l = jsonDecode(f.readAsStringSync());
-  if (sw == 'item') {
+  /* if (sw == 'item') {
     f = File('.data/marked.json');
     l.addAll(jsonDecode(f.readAsStringSync()));
-  }
+  } */
   for (var element in l) {
     r.add(itemFromJson(element));
   }
@@ -422,7 +422,7 @@ void registerUnmark(String id) {
 ///makes an Item for custom add
 void makeCustom(int conum, int id, double price, WebSocketChannel wsc) {
   int uid = -1;
-  for (User u in allUsers) {
+  for (User u in activeUsers) {
     if (u.conum == conum) uid = u.id;
   }
   Item i = Item(id, id.toString(), 1, price, uid, '', 1, '', 0, 0);

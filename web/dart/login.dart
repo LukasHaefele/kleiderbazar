@@ -104,8 +104,13 @@ void login() {
 
 ///valid login response user
 void loggedIn(String username, String id, String payout, String ammount,
-    ClientWebSocket ws) {
+    bool byCred, ClientWebSocket ws) {
   killKey();
+  final Storage ls = window.localStorage;
+  ls['id'] = id;
+  if (byCred) {
+    window.location.reload();
+  }
   querySelector('#ammountMarker')?.text = 'Warenzahl:' + ammount;
   querySelector('#loginbutton')?.style.display = 'none';
   querySelector('.welcome')?.style.display = 'none';
@@ -126,8 +131,6 @@ void loggedIn(String username, String id, String payout, String ammount,
       window.location.reload();
     });
   initStorefront(ws, id);
-  final Storage ls = window.localStorage;
-  ls['id'] = id;
 }
 
 ///Successful registration response

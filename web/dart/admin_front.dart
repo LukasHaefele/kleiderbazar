@@ -71,6 +71,12 @@ void initializeAdmin(String id, Map stat, ClientWebSocket ws) {
   querySelector('#getAllPOR')?.onClick.listen((event) {
     ws.send('admin_payout_all');
   });
+  querySelector('#waitListEdit')?.onClick.listen((event) {
+    showPanel('#waitListPanel');
+  });
+  querySelector('#closeWaitList')?.onClick.listen((event) {
+    hidePanel('#waitListPanel');
+  });
   querySelector('.admin')?.style.display = 'flex';
   ws.send('admin_get_users');
   final Storage ls = window.localStorage;
@@ -104,6 +110,62 @@ void updateVars(ClientWebSocket ws) {
   String donation =
       (document.getElementById('donation') as InputElement).value!;
   ws.send('update_stat; comissionFee: $comissionFee; donation: $donation');
+}
+
+List<Node> wait = [];
+
+///add Waiting
+void addWaiting(Map m, ClientWebSocket ws) {
+  int index = wait.length;
+  DivElement waitingDiv = DivElement()
+    ..style.display = 'flex'
+    ..style.flexDirection = 'column'
+    ..append(ParagraphElement()..text = '${m['name']}')
+    ..append(ParagraphElement()..text = '${m['username']}')
+    ..append(ParagraphElement()..text = '${m['email']}')
+    ..append(ParagraphElement()
+      ..style.display = 'flex'
+      ..style.flexDirection = 'row'
+      ..append(ButtonElement()
+        ..classes.add('panelButton')
+        ..text = 'Up'
+        ..onClick.listen((event) {
+          if (index == wait.length) return;
+          moveUp(index, ws);
+          index++;
+        }))
+      ..append(ButtonElement()
+        ..classes.add('panelButton')
+        ..text = 'Down'
+        ..onClick.listen((event) {
+          if (index == 0) return;
+          moveDown(index, ws);
+          index--;
+        })));
+  wait.add(waitingDiv);
+}
+
+void moveUp(int index, ClientWebSocket ws) {
+  Node h = wait[index - 1];
+  wait[index - 1] = wait[index];
+  wait[index] = h;
+  drawWaitList();
+  ws.send('admin_waitlist_up; index: $index');
+}
+
+void moveDown(int index, ClientWebSocket ws) {
+  Node h = wait[index + 1];
+  wait[index + 1] = wait[index];
+  wait[index] = h;
+  drawWaitList();
+  ws.send('admin_waitlist_down; index: $index');
+}
+
+void drawWaitList() {
+  Element e = querySelector('#waitList')!..innerHtml = '';
+  for (Node n in wait) {
+    e.append(n);
+  }
 }
 
 ///adds users to pay out to admin storefront
@@ -181,12 +243,14 @@ void addUnconfirmed(
 
 ///Adds a user to the admin user edit panel
 void addToEdit(String id, String username, String name, bool register,
-    bool admin, String conum, ClientWebSocket ws) {
+    bool admin, String conum, bool emp, ClientWebSocket ws) {
   ParagraphElement p = ParagraphElement()..id = 'tags';
   if (register) {
     p.text = 'Kasse';
   } else if (admin) {
     p.text = 'Admin';
+  } else if (emp) {
+    p.text = 'Mitarbeiter';
   }
   DivElement newUser = DivElement();
   newUser
@@ -196,7 +260,7 @@ void addToEdit(String id, String username, String name, bool register,
     ..append(DivElement()
       ..classes.add('flexrow')
       ..append(ButtonElement()
-        ..text = 'Toggle'
+        ..text = 'Kasse'
         ..classes.add('panelButton')
         ..onClick.listen((event) {
           if (register) {
@@ -208,18 +272,30 @@ void addToEdit(String id, String username, String name, bool register,
           ws.send('admin_make_register; id: $id');
         }))
       ..append(ButtonElement()
-        ..text = 'Löschen'
+        ..text = 'del'
         ..classes.add('panelButton')
         ..onClick.listen((event) {
           ws.send('admin_delete_user; id: $id');
           newUser.remove();
         }))
       ..append(ButtonElement()
-        ..text = 'PW-R'
+        ..text = 'PwR'
         ..classes.add('panelButton')
         ..onClick.listen((event) {
           ws.send('admin_password_reset; id: $id');
           newUser.remove();
+        }))
+      ..append(ButtonElement()
+        ..text = 'Mia'
+        ..classes.add('panelButton')
+        ..onClick.listen((event) {
+          ws.send('admin_make_emp; id: $id');
+          if (!emp) {
+            p.text = 'Mitarbeiter';
+          } else {
+            p.text = '';
+          }
+          emp = !emp;
         })))
     ..append(p);
   querySelector('#usersToEdit')?.append(newUser);

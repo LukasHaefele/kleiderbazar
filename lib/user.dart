@@ -37,8 +37,29 @@ class User {
   ///unique Commission number
   late int conum;
 
-  User(this.id, this.username, this.password, this.name, this.register,
-      this.payout, this.admin, this.email, this.ammounts, this.conum);
+  late bool emp;
+
+  late bool pwR;
+
+  late bool unc;
+
+  late bool del;
+
+  User(
+      this.id,
+      this.username,
+      this.password,
+      this.name,
+      this.register,
+      this.payout,
+      this.admin,
+      this.email,
+      this.ammounts,
+      this.conum,
+      this.emp,
+      this.pwR,
+      this.unc,
+      this.del);
 
   int fullAmmount() {
     int r = 0;
@@ -61,7 +82,11 @@ Map userToJson(User u) {
     'admin': u.admin,
     'email': u.email,
     'ammounts': u.ammounts,
-    'conum': u.conum
+    'conum': u.conum,
+    'emp': u.emp,
+    'pwR': u.pwR,
+    'unc': u.unc,
+    'del': u.del
   };
 
   return m;
@@ -69,37 +94,54 @@ Map userToJson(User u) {
 
 ///generates user from Map from json
 User userFromJson(Map m) {
-  return User(m['id'], m['username'], m['password'], m['name'], m['register'],
-      m['payout'], m['admin'], m['email'], m['ammounts'], m['conum']);
+  return User(
+      m['id'],
+      m['username'],
+      m['password'],
+      m['name'],
+      m['register'],
+      m['payout'],
+      m['admin'],
+      m['email'],
+      m['ammounts'],
+      m['conum'],
+      m['emp'],
+      m['pwR'],
+      m['unc'],
+      m['del']);
 }
 
 ///Empty User to be returned if no user was found
-User emptyUser =
-    User(-1, '', '', '', false, 0.0, false, '', [stat['maxItem'], 0], -1);
+User emptyUser = User(-1, '', '', '', false, 0.0, false, '',
+    [stat['maxItem'], 0], -1, false, false, false, false);
 
 ///List of active users
 List<User> activeUsers = getUsers();
 
+List coHash = jsonDecode(File('.data/coHash.json').readAsStringSync());
+
+List waiting = jsonDecode(File('.data/waiting.json').readAsStringSync());
+
 ///List of deleted users
-List<User> deleted = getDeleted();
+//List<User> deleted = getDeleted();
 
 ///List of all users
-List<User> allUsers = makeAll();
+//List<User> allUsers = makeAll();
 
 ///List of Reset users
-List<User> resetUsers = getReset();
+//List<User> resetUsers = getReset();
 
 ///Generates List of all Users
-List<User> makeAll() {
+/* List<User> makeAll() {
   List<User> l = [];
   l.addAll(activeUsers);
   l.addAll(deleted);
   l.addAll(resetUsers);
   return l;
 }
-
+ */
 ///get Reset User List
-List<User> getReset() {
+/* List<User> getReset() {
   List<User> l = [];
   File f = File('.data/reset.json');
   List ll = jsonDecode(f.readAsStringSync());
@@ -109,9 +151,9 @@ List<User> getReset() {
   }
   return l;
 }
-
+ */
 ///save Reset User List
-void saveReset() {
+/* void saveReset() {
   List l = [];
   for (var element in resetUsers) {
     l.add(userToJson(element));
@@ -119,9 +161,9 @@ void saveReset() {
   File f = File('.data/reset.json');
   f.writeAsString(jsonEncode(l));
 }
-
+ */
 ///get Deleted User List
-List<User> getDeleted() {
+/* List<User> getDeleted() {
   List<User> l = [];
   File f = File('.data/deleted.json');
   List ll = jsonDecode(f.readAsStringSync());
@@ -131,9 +173,9 @@ List<User> getDeleted() {
   }
   return l;
 }
-
+ */
 ///save Deleted User List
-void saveDeleted() {
+/* void saveDeleted() {
   List l = [];
   for (var element in deleted) {
     l.add(userToJson(element));
@@ -141,7 +183,7 @@ void saveDeleted() {
   File f = File('.data/deleted.json');
   f.writeAsString(jsonEncode(l));
 }
-
+ */
 ///gets Users from json file
 List<User> getUsers() {
   List<User> l = [];
@@ -169,22 +211,32 @@ void saveUsers() async {
 ///logs in User through loginpanel
 void login(String username, String password, WebSocketChannel wsc) {
   for (User u in activeUsers) {
-    if (u.username == username && u.password == password) {
-      int id = u.id;
-      if (u.register) {
-        print('A Register has opened');
-        wsc.sink.add('login_register; id: $id');
-      } else if (u.admin) {
-        print('An Admin has connected to the System');
-        String sendable = jsonEncode(stat);
-        wsc.sink.add('login_admin; id: $id; stat: $sendable');
-      } else {
-        double p = u.payout;
-        int am = u.fullAmmount();
+    if (u.username == username) {
+      if (u.unc) {
         wsc.sink.add(
-            'login_success; username: $username; id: $id; payout: $p; ammount: $am');
+            'error; message: Ihr Account wurde noch nicht bestätigt. Bitte haben sie noch ein wenig Geduld. Sie werden eine Email erhalten sobald ihr account bestätigt wurde.');
+        return;
+      } else if (u.pwR) {
+        wsc.sink.add(
+            'error; message: Ihr Passwort wurde zurückgesetzt. Bitte setzen sie ein neues Passwort indem sie sich erneut mit gleicher Email und gleichem Benutzernamen registrieren. Alles bereits erstellten Waren werden weiterhin auffindbar sein.');
+        return;
+      } else if (u.password == password) {
+        int id = u.id;
+        if (u.register) {
+          print('A Register has opened');
+          wsc.sink.add('login_register; id: $id');
+        } else if (u.admin) {
+          print('An Admin has connected to the System');
+          String sendable = jsonEncode(stat);
+          wsc.sink.add('login_admin; id: $id; stat: $sendable');
+        } else {
+          double p = u.payout;
+          int am = u.fullAmmount();
+          wsc.sink.add(
+              'login_success; username: $username; id: $id; payout: $p; ammount: $am; byCred: true');
+        }
+        return;
       }
-      return;
     }
   }
   wsc.sink.add('login_failure');
@@ -193,43 +245,46 @@ void login(String username, String password, WebSocketChannel wsc) {
 ///registers User
 void registerUser(String username, String password, String name, String email,
     WebSocketChannel wsc) {
-  if (isReset(username, password, name, email, wsc)) return;
-
   if (stat['bareUserNum'] >= stat['maximumUser']) {
+    waiting.add({
+      'username': username,
+      'password': password,
+      'name': name,
+      'email': email
+    });
+    File('.data/waiting.json').writeAsStringSync(jsonEncode(waiting));
     wsc.sink.add(
-        'error; message: Leider ist die maximale Anzahl an Nutzern erreicht.');
+        'error; message: Leider ist die maximale Anzahl an Nutzern erreicht. Sie wurden auf die Warteliste gesetzt.');
     return;
   }
   int id = getUserId();
   for (User u in activeUsers) {
     if (u.username == username) {
+      if (u.pwR) {
+        u.password = password;
+        wsc.sink.add(
+            'error; message: Ihr Passwort wurde zu dem neuen Passwort geändert. Bitte Loggen sie sich erneut ein.');
+        return;
+      }
       wsc.sink.add('error; message: Nutzername ist bereits vergeben.');
       return;
     }
     if (u.email == email) {
       wsc.sink.add('error; message: Diese E-Mail ist bereits registriert.');
-    }
-  }
-  for (User u in unconfirmed) {
-    if (u.username == username) {
-      wsc.sink.add('error; message: Nutzername ist bereits vergeben.');
       return;
-    }
-    if (u.email == email) {
-      wsc.sink.add('error; message: Diese E-Mail ist bereits registriert.');
     }
   }
   User newUser = User(id, username, password, name, false, -stat['donation'],
-      false, email, [0, 0], getCoNum());
-  unconfirmed.add(newUser);
+      false, email, [0, 0], getCoNum(id), false, false, true, false);
+  activeUsers.add(newUser);
   stat['bareUserNum']++;
   saveStat();
-  saveUnconfirmed();
+  saveUsers();
   wsc.sink.add('register_success; id: $id');
 }
 
 ///checks whether User is a password reset User
-bool isReset(String username, String password, String name, String email,
+/* bool isReset(String username, String password, String name, String email,
     WebSocketChannel wsc) {
   for (User u in resetUsers) {
     if (u.email == email) {
@@ -249,28 +304,41 @@ bool isReset(String username, String password, String name, String email,
   }
   return false;
 }
-
+ */
 ///Updates E-Mail List
 void updateEmailList() {
-  String write = '';
+  String emp = '';
+  String sellers = '';
   for (User u in activeUsers) {
-    if (!u.admin && !u.register) {
-      String email = u.email;
-      String name = u.name;
-      write += '$name: $email\n';
+    if (!u.admin && !u.register && !u.del) {
+      String s = 'Name: ${u.name}, Nutzername: ${u.username}, Kom: ${u.conum}'
+          ', email: ${u.email}\n';
+      if (u.emp) {
+        emp += s;
+      } else {
+        sellers += s;
+      }
     }
   }
   File f = File('web/label/emails.txt');
+  String write = '---------------------Mitarbeiter---------------------\n$emp'
+      '----------------------Verkäufer----------------------\n$sellers';
   f.writeAsStringSync(write);
 }
 
 ///returns Commission Number for new user
-int getCoNum() {
-  return stat['bareUserNum'];
+int getCoNum(int id) {
+  for (int i = 0; i < stat['bareUserNum']; i++) {
+    coHash[i] = coHash[i] ?? id;
+    if (coHash[i] == id) {
+      File('.data/coHash.json').writeAsStringSync(jsonEncode(coHash));
+      return i;
+    }
+  }
+  return -1;
 }
 
-List<User> unconfirmed = getUnconfirmed();
-
+/* 
 ///gets unconfirmed Users
 List<User> getUnconfirmed() {
   List<User> l = [];
@@ -295,7 +363,7 @@ void saveUnconfirmed() async {
   f.writeAsString(jsonEncode(l));
 }
 
-///gets new Id for new user
+ */ ///gets new Id for new user
 int getUserId() {
   /*
   if (activeUsers.isNotEmpty) {
@@ -319,13 +387,16 @@ bool userIdTaken(int id) {
 
 ///logs in user through saved token
 void loginId(int id, WebSocketChannel wsc) {
-  for (User u in unconfirmed) {
-    if (u.id == id) {
-      wsc.sink.add('error; message: Ihr Account wurde noch nicht bestätigt.');
-    }
-  }
   for (User u in activeUsers) {
     if (u.id == id) {
+      if (u.unc) {
+        return;
+      }
+      if (u.pwR) {
+        wsc.sink.add(
+            'error; message: Ihr Passwort wurde zurückgesetzt. Bitte setzen sie ein neues Passwort indem sie sich erneut mit gleicher Email und gleichem Benutzernamen registrieren. Alles bereits erstellten Waren werden weiterhin auffindbar sein.');
+        return;
+      }
       String username = u.username;
       if (u.register) {
         print('A Register has opened');
@@ -348,7 +419,7 @@ void loginId(int id, WebSocketChannel wsc) {
 
 ///gets User by Id
 User getUserById(int id) {
-  for (User u in allUsers) {
+  for (User u in activeUsers) {
     if (u.id == id) {
       return u;
     }

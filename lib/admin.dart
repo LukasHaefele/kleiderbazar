@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:kleiderbazar/actions.dart';
 import 'package:kleiderbazar/item.dart';
 import 'package:kleiderbazar/transaction.dart';
 import 'package:kleiderbazar/user.dart';
@@ -17,8 +18,12 @@ void adminGetAll(WebSocketChannel wsc) {
     bool adm = u.admin;
     String name = u.name;
     int conum = u.conum;
+    String act = ADMIN_ADD_EDIT;
+    bool emp = u.emp;
+    String email = u.email;
+    if (u.unc) act = ADMIN_ADD_UNCONFIRMED;
     wsc.sink.add(
-        'admin_add_edit; id: $id; username: $username; register: $reg; admin: $adm; name: $name; conum: $conum');
+        '$act; id: $id; username: $username; register: $reg; admin: $adm; name: $name; conum: $conum; emp: $emp; email: $email');
     if (!u.admin && !u.register && u.payout > 0) {
       double payout = u.payout;
       wsc.sink
@@ -32,19 +37,27 @@ void adminGetAll(WebSocketChannel wsc) {
     wsc.sink
         .add('admin_add_transaction; id: $id; items: $items; total: $total');
   }
-  for (User u in unconfirmed) {
-    int id = u.id;
-    String username = u.username;
-    String name = u.name;
-    String email = u.email;
-    wsc.sink.add(
-        'admin_add_unconfirmed; id: $id; username: $username; name: $name; email: $email');
-  }
   for (Item i in items) {
     int id = i.id;
     String src = i.lablesrc;
     wsc.sink.add('admin_item_edit; id: $id; src: $src');
   }
+  for (Map m in waiting) {
+    wsc.sink.add('admin_waitlist_add; pars: ${jsonEncode(m)}');
+  }
+  wsc.sink.add('admin_waitlist_print');
+}
+
+void waitlistUp(int index) {
+  Map m = waiting[index - 1];
+  waiting[index - 1] = waiting[index];
+  waiting[index] = m;
+}
+
+void waitlistDown(int index) {
+  Map m = waiting[index + 1];
+  waiting[index + 1] = waiting[index];
+  waiting[index] = m;
 }
 
 ///computes payout for seller
@@ -61,7 +74,6 @@ void payout(int id, WebSocketChannel wsc) async {
 }
 
 ///generates all Payout Receipts in one Button Click
-
 void adminPayoutAll(WebSocketChannel wsc) async {
   final pdfFile = pw.Document();
   for (User u in activeUsers) {
@@ -137,15 +149,17 @@ Future<String> makePayoutReceipt(User u) async {
       (100 * stat['comissionFee']).toStringAsFixed(2) +
       '% Spende                                         ' +
       (hold * stat['comissionFee']).toStringAsFixed(2) +
-      '\tEuro\nabzgl. Bearbeitungsgebühr                                  ' +
-      stat['donation'].toStringAsFixed(2) +
-      '\tEuro\n' +
-      sep +
+      '\tEuro\n';
+  if (!u.emp) {
+    write += 'abzgl. Bearbeitungsgebühr                                  ' +
+        stat['donation'].toStringAsFixed(2) +
+        '\tEuro\n';
+  }
+  write += sep +
       'Auszahlungsbetrag für Komission ' +
       u.conum.toString() +
       '                     ' +
-      (hold - (hold * stat['comissionFee']) - stat['donation'])
-          .toStringAsFixed(1) +
+      (hold - (hold * stat['comissionFee']) - pao(u.emp)).toStringAsFixed(1) +
       '0\tEuro\n';
   write += sep + endstring + sep;
 
@@ -153,25 +167,32 @@ Future<String> makePayoutReceipt(User u) async {
   return r.substring(4);
 }
 
+double pao(bool emp) {
+  if (emp) {
+    return 0.0;
+  } else {
+    return stat['donation'];
+  }
+}
+
 String endstring =
     '\nAnfragen zu vermissten Artikeln unter basarsupport@cvjm-gomaringen.de \nDer nächste Kinderbasar findet am 25.9.22 in der Sport- und Kulturhalle \nGomaringen statt.\n\n';
 
 ///confirm user accounts
 void adminConfirm(int id, WebSocketChannel wsc) {
-  for (User u in unconfirmed) {
+  for (User u in activeUsers) {
     if (u.id == id) {
-      activeUsers.add(u);
-      unconfirmed.remove(u);
-      saveUnconfirmed();
+      u.unc = false;
       saveUsers();
       String username = u.username;
       String name = u.name;
       bool reg = u.register;
       bool adm = u.admin;
       int conum = u.conum;
+      bool emp = u.emp;
       updateEmailList();
       wsc.sink.add(
-          'admin_add_edit; id: $id; username: $username; register: $reg; admin: $adm; name: $name; conum: $conum');
+          'admin_add_edit; id: $id; username: $username; register: $reg; admin: $adm; name: $name; conum: $conum; emp: $emp');
       return;
     }
   }
@@ -217,55 +238,82 @@ void adminMakeRegister(int id) {
   User u = getUserById(id);
   if (u == emptyUser) return;
   u.register = !u.register;
-  stat['maximumUser']++;
+  if (u.register) {
+    stat['maximumUser']++;
+    coHash[u.conum] = null;
+    u.conum = -1;
+    File('.data/coHash.json').writeAsStringSync(jsonEncode(coHash));
+  } else {
+    u.conum = getCoNum(id);
+  }
   updateEmailList();
   saveUsers();
   saveStat();
+}
+
+void adminMakeEmp(int id) {
+  User u = getUserById(id);
+  u.emp = !u.emp;
+  if (u.emp) {
+    u.payout += stat['donation'];
+  } else {
+    u.payout -= stat['donation'];
+  }
+  saveUsers();
 }
 
 ///deletes User and saves it to deleted
 void adminDeleteUser(int id) {
   User u = getUserById(id);
   if (u == emptyUser) return;
-  deleted.add(u);
-  activeUsers.remove(u);
+  u.del = true;
   updateEmailList();
-  for (Item i in items) {
-    if (i.usrId == id) {
-      items.remove(i);
-    }
-  }
-  stat['maximumUser']++;
-  updateEmailList();
-  saveDeleted();
+  coHash[u.conum] = null;
+  unWaitWaiting();
   saveUsers();
-  saveItems('item');
+  stat['bareUserNum']--;
+  saveStat();
+}
+
+void unWaitWaiting() {
+  if (waiting.isEmpty) return;
+  Map m = waiting.removeAt(0);
+  int id = getUserId();
+  User newUser = User(
+      id,
+      m["username"],
+      m["password"],
+      m["name"],
+      false,
+      -stat["donation"],
+      false,
+      m["email"],
+      [0, 0],
+      getCoNum(id),
+      false,
+      false,
+      false,
+      false);
+  activeUsers.add(newUser);
+  saveUsers();
+  stat["bareUserNum"]++;
   saveStat();
 }
 
 ///Archives all files
 void adminArchiveAll() async {
-  File del = File('.data/deleted.json');
   File ite = File('.data/item.json');
-  File sol = File('.data/sold.json');
   File sta = File('.data/stat.json');
   File trl = File('.data/tr.json');
-  File unc = File('.data/unconfirmed.json');
   File use = File('.data/user.json');
-  File res = File('.data/reset.json');
+  File wai = File('.data/waiting.json');
   DateTime today = DateTime.now();
 
   archiveLables();
 
-  await File('.data/.dataarchive/$today-deleted.json')
-      .writeAsString(await del.readAsString());
-  await del.writeAsString('[]');
   await File('.data/.dataarchive/$today-item.json')
       .writeAsString(await ite.readAsString());
   await ite.writeAsString('[]');
-  await File('.data/.dataarchive/$today-sol.json')
-      .writeAsString(await sol.readAsString());
-  await sol.writeAsString('[]');
   await File('.data/.dataarchive/$today-stat.json')
       .writeAsString(await sta.readAsString());
   await sta.writeAsString(
@@ -273,22 +321,26 @@ void adminArchiveAll() async {
   await File('.data/.dataarchive/$today-tr.json')
       .writeAsString(await trl.readAsString());
   await trl.writeAsString('[]');
-  await File('.data/.dataarchive/$today-unconfirmed.json')
-      .writeAsString(await unc.readAsString());
-  await unc.writeAsString('[]');
   await File('.data/.dataarchive/$today-user.json')
       .writeAsString(await use.readAsString());
-  await File('.data/dataarchive/$today-reset.json')
-      .writeAsString(await res.readAsString());
-  await res.writeAsString('[]');
   //use.writeAsString('[]');
+  await File('.data/.dataarchive/$today-waiting.json')
+      .writeAsString(await wai.readAsString());
+  await wai.writeAsString('[]');
+  await File('.data/coHash.json').writeAsString(clearCoHash());
 
-  deleted = getDeleted();
   items = getItems('item');
   allTr = getTr();
   freeUsers();
-  unconfirmed = getUnconfirmed();
   stat = getStat();
+}
+
+String clearCoHash() {
+  List l = [];
+  for (int i = 0; i < stat['maximumUser']; i++) {
+    l.add(null);
+  }
+  return jsonEncode(l);
 }
 
 void archiveLables() async {
@@ -322,10 +374,6 @@ void freeUsers() {
 void adminResetPassword(int id, WebSocketChannel wsc) {
   User u = getUserById(id);
   if (u == emptyUser) return;
-  resetUsers.add(u);
-  activeUsers.remove(u);
-  saveReset();
+  u.pwR = true;
   saveUsers();
-  stat['maximumUser']++;
-  saveStat();
 }
