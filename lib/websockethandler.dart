@@ -163,7 +163,13 @@ void getAction(Map<String, dynamic> request, WebSocketChannel wsc) {
       return;
 
     case ADMIN_UPDATE_STAT:
-      updateStat(request['comissionFee'], request['donation']);
+      updateStat(
+          request['comissionFee'],
+          request['donation'],
+          request['maxUser'],
+          request['itemsPu'],
+          request['dtUpe'],
+          request['dtLow']);
       return;
 
     case ADMIN_MAKE_REGISTER:

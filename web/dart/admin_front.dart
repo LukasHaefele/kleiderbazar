@@ -17,6 +17,14 @@ void initializeAdmin(String id, Map stat, ClientWebSocket ws) {
       stat['comissionFee'].toString();
   (document.getElementById('donation') as InputElement).value =
       stat['donation'].toString();
+  (document.getElementById('maxUser') as InputElement).value =
+      stat['maximumUser'].toString();
+  (document.getElementById('itemsPu') as InputElement).value =
+      stat['maxItem'].toString();
+  (document.getElementById('dtUpe') as InputElement).value =
+      DateTime.parse(stat['dLower']).toString();
+  (document.getElementById('dtLow') as InputElement).value =
+      DateTime.parse(stat['dUpper']).toString();
   querySelector('#accountbutton')
     ?..style.display = 'flex'
     ..text = 'Admin'
@@ -109,7 +117,12 @@ void updateVars(ClientWebSocket ws) {
       (document.getElementById('comissionFee') as InputElement).value!;
   String donation =
       (document.getElementById('donation') as InputElement).value!;
-  ws.send('update_stat; comissionFee: $comissionFee; donation: $donation');
+  String maxUser = (document.getElementById('maxUser') as InputElement).value!;
+  String itemsPu = (document.getElementById('itemsPu') as InputElement).value!;
+  String dtUpe = (document.getElementById('dtUpe') as InputElement).value!;
+  String dtLow = (document.getElementById('dtLow') as InputElement).value!;
+  ws.send(
+      'update_stat; comissionFee: $comissionFee; donation: $donation; maxUser: $maxUser; itemsPu: $itemsPu; dtUpe: $dtUpe; dtLow: $dtLow');
 }
 
 List<Node> wait = [];

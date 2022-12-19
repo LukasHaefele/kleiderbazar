@@ -200,9 +200,14 @@ void adminConfirm(int id, WebSocketChannel wsc) {
 }
 
 ///Updates the Status Info
-void updateStat(String comissionFee, String donation) {
+void updateStat(String comissionFee, String donation, String mu, String ipu,
+    String dtu, String dtl) {
   stat['comissionFee'] = double.parse(comissionFee);
   stat['donation'] = double.parse(donation);
+  stat['maximumUser'] = jsonDecode(mu);
+  stat['maxItem'] = jsonDecode(ipu);
+  stat['dLower'] = dtu.replaceAll('T', ' ');
+  stat['dUpper'] = dtl.replaceAll('T', ' ');
   saveStat();
 }
 
