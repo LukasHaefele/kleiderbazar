@@ -78,8 +78,8 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
       return;
 
     case ITEM_UPDATE_TOTAL:
-      querySelector('#ammountMarker')?.text =
-          'Warenzahl: ' + request['ammountTotal'];
+      /* querySelector('#ammountMarker')?.text =
+          'Warenzahl: ' + request['ammountTotal']; */
       return;
 
     case REGISTER_ITEM:
@@ -88,7 +88,7 @@ void getaction(Map<String, dynamic> request, ClientWebSocket ws) {
 
     case REGISTER_RECEIPT:
       generateReceipt(request['src'], request['change']);
-      showPanel('#tipPanel');
+      //showPanel('#tipPanel');
       return;
 
     case REGISTER_BILL:

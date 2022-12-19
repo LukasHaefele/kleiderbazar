@@ -316,6 +316,7 @@ void registerLookup(WebSocketChannel wsc, int id, bool b) {
         i.marked++;
         String s = jsonEncode(itemToJson(i));
         wsc.sink.add('register_bill; item: $s');
+        return;
       }
     }
   }

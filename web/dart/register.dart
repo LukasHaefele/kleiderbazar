@@ -107,7 +107,7 @@ void registerItem(Map m, ClientWebSocket ws) {
 
 ///Add Item to bill
 void addToBill(Map m, ClientWebSocket ws) {
-  ws.send('register_mark; id: ' + m['id'].toString());
+  //ws.send('register_mark; id: ' + m['id'].toString());
   modNumber(numScanned + 1);
   //querySelector('#change')?.text = '';
   re.add(m['id']);
@@ -118,7 +118,7 @@ void addToBill(Map m, ClientWebSocket ws) {
       ..classes.add('registerButton')
       ..text = 'Entfernen'
       ..onClick.listen((event) {
-        ws.send('register_unmark; id: ' + m['id'].toString());
+        //ws.send('register_unmark; id: ' + m['id'].toString());
         modNumber(numScanned - 1);
         newDiv.remove();
         m['ammount']++;
