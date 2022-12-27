@@ -12,6 +12,7 @@ import 'package:pdf/widgets.dart' as pw;
 ///sends users and transactions to admin frontend
 void adminGetAll(WebSocketChannel wsc) {
   for (User u in activeUsers) {
+    if (u.del) continue;
     int id = u.id;
     String username = u.username;
     bool reg = u.register;
