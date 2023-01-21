@@ -381,5 +381,7 @@ void adminResetPassword(int id, WebSocketChannel wsc) {
   User u = getUserById(id);
   if (u == emptyUser) return;
   u.pwR = true;
+  stat['bareUserNum']--;
   saveUsers();
+  saveStat();
 }
