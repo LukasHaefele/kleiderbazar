@@ -280,8 +280,13 @@ void registerUser(String username, String password, String name, String email,
       return;
     }
   }
+  int coNum = getCoNum(id);
+  if (coNum == -1) {
+    wsc.sink.add(
+        'error; message: Es gab ein Problem bei der Zuweisung der Kom-Nummer. Bitte melden sie sich bei einem Administrator.');
+  }
   User newUser = User(id, username, password, name, false, -stat['donation'],
-      false, email, [0, 0], getCoNum(id), false, false, true, false);
+      false, email, [0, 0], coNum, false, false, true, false);
   activeUsers.add(newUser);
   stat['bareUserNum']++;
   saveStat();
@@ -335,8 +340,8 @@ void updateEmailList() {
 ///returns Commission Number for new user
 int getCoNum(int id) {
   for (int i = 0; i < stat['bareUserNum']; i++) {
-    coHash[i] = coHash[i] ?? id;
-    if (coHash[i] == id) {
+    if (coHash[i] == -1) {
+      coHash[i] = id;
       File('.data/coHash.json').writeAsStringSync(jsonEncode(coHash));
       return i;
     }
