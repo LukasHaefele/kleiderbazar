@@ -265,6 +265,7 @@ void registerUser(String username, String password, String name, String email,
         wsc.sink.add(
             'error; message: Ihr Passwort wurde zu dem neuen Passwort geändert. Bitte Loggen sie sich erneut ein.');
         u.pwR = false;
+        saveUsers();
         return;
       }
       wsc.sink.add('error; message: Nutzername ist bereits vergeben.');
