@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 //import 'dart:typed_data';
 
@@ -22,6 +23,22 @@ Future<String> generateLabel(int id, String name, double price, String size,
   return lsrc;
 }
 
+/// Removes all invalid characters from String
+String removeInvalidChar(String s) {
+  String r = '';
+  for (int i = 0; i < s.length; i++) {
+    if (invCharMap.containsKey(s[i])) {
+      r += invCharMap[s[i]];
+    } else {
+      r += s[i];
+    }
+  }
+  return r;
+}
+
+///Map saving invalid Characters
+Map invCharMap = jsonDecode(File('.data/invChar.json').readAsStringSync());
+
 ///Putting together the lable from parts
 Future<String> getLabel(String qsrc, int id, String name, double price,
     String size, int userid, int ammount) async {
@@ -32,7 +49,7 @@ Future<String> getLabel(String qsrc, int id, String name, double price,
   File saveWhole = File('web/$wsrc');
   String pr = price.toStringAsFixed(2);
   //int conum = getUserById(userid)!.conum;
-  String lableText = '\n$name';
+  String lableText = '\n${removeInvalidChar(name)}';
   if (size != '') {
     lableText = lableText + '\nGröße: $size';
   }
@@ -120,7 +137,6 @@ Future<String> renderQr(QrCode qr, int id) async {
   print('saved File');
   return src;
 }
-
 
 /*pw.Page(
 pageFormat: PdfPageFormat(200, 420),
