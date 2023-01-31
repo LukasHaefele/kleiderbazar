@@ -271,7 +271,12 @@ void registerUser(String username, String password, String name, String email,
       return;
     }
     if (u.email == email) {
-      wsc.sink.add('error; message: Diese E-Mail ist bereits registriert.');
+      if (u.pwR) {
+        wsc.sink.add(
+            'error; message: Ihr Passwort wurde zurück gesetzt. Bitte registrieren sie sich erneut mit ihrem Nutzernamen.');
+      } else {
+        wsc.sink.add('error; message: Diese E-Mail ist bereits registriert.');
+      }
       return;
     }
   }
