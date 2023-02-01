@@ -340,7 +340,7 @@ void updateEmailList() {
 
 ///returns Commission Number for new user
 int getCoNum(int id) {
-  for (int i = 0; i < stat['bareUserNum']; i++) {
+  for (int i = 0; i < coHash.length; i++) {
     if (coHash[i] == -1) {
       coHash[i] = id;
       File('.data/coHash.json').writeAsStringSync(jsonEncode(coHash));
