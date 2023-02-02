@@ -286,8 +286,21 @@ void registerUser(String username, String password, String name, String email,
     wsc.sink.add(
         'error; message: Es gab ein Problem bei der Zuweisung der Kom-Nummer. Bitte melden sie sich bei einem Administrator.');
   }
-  User newUser = User(id, username, password, name, false, -stat['donation'],
-      false, email, [0, 0], coNum, false, false, true, false);
+  User newUser = User(
+      id,
+      username.replaceAll(' ', ''),
+      password,
+      name,
+      false,
+      -stat['donation'],
+      false,
+      email,
+      [0, 0],
+      coNum,
+      false,
+      false,
+      true,
+      false);
   activeUsers.add(newUser);
   stat['bareUserNum']++;
   saveStat();
