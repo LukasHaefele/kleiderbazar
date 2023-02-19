@@ -275,7 +275,7 @@ void adminDeleteUser(int id) {
   u.del = true;
   updateEmailList();
   coHash[u.conum] = null;
-  unWaitWaiting();
+  //unWaitWaiting();
   saveUsers();
   stat['bareUserNum']--;
   saveStat();

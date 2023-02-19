@@ -262,10 +262,10 @@ void registerUser(String username, String password, String name, String email,
     if (u.username == username) {
       if (u.pwR) {
         u.password = password;
-        wsc.sink.add(
-            'error; message: Ihr Passwort wurde zu dem neuen Passwort geändert. Bitte Loggen sie sich erneut ein.');
         u.pwR = false;
         saveUsers();
+        wsc.sink.add(
+            'error; message: Ihr Passwort wurde zu dem neuen Passwort geändert. Bitte Loggen sie sich erneut ein.');
         return;
       }
       wsc.sink.add('error; message: Nutzername ist bereits vergeben.');
@@ -275,16 +275,19 @@ void registerUser(String username, String password, String name, String email,
       if (u.pwR) {
         wsc.sink.add(
             'error; message: Ihr Passwort wurde zurück gesetzt. Bitte registrieren sie sich erneut mit ihrem Nutzernamen.');
+        return;
+      } else if (u.admin || u.register) {
       } else {
         wsc.sink.add('error; message: Diese E-Mail ist bereits registriert.');
+        return;
       }
-      return;
     }
   }
   int coNum = getCoNum(id);
   if (coNum == -1) {
     wsc.sink.add(
         'error; message: Es gab ein Problem bei der Zuweisung der Kom-Nummer. Bitte melden sie sich bei einem Administrator.');
+    return;
   }
   User newUser = User(
       id,
