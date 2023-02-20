@@ -271,8 +271,8 @@ Item? removeItem(int id, bool trash, WebSocketChannel wsc) {
         i.sold++;
       }
       User u = getUserById(i.usrId);
+      remakeWhole(u.id, u.conum);
       u.ammounts[i.productType] -= i.ammount;
-      wsc.sink.add('$ITEM_UPDATE_TOTAL; ammountTotal: ${u.fullAmmount()}');
       wsc.sink.add('$ITEM_UPDATE_TOTAL; ammountTotal: ${u.fullAmmount()}');
       saveItems('item');
       saveUsers();
