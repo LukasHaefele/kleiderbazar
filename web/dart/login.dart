@@ -53,6 +53,9 @@ void initLogin(ClientWebSocket ws) {
     } else if (username == '' || password == '' || name == '' || email == '') {
       error('Bitte alle relevanten Felder ausfüllen.');
       return;
+    } else if (username.contains(RegExp(r'( |€)'))) {
+      error(
+          'In ihrem Nutzernamen oder Passwort befinden sich nicht akzeptierte Zeichen wie Leerzeichen oder "€".');
     } else {
       Key key = Key.fromUtf8(getKey());
       IV iv = IV.fromLength(16);
