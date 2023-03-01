@@ -285,8 +285,13 @@ void registerUser(String username, String password, String name, String email,
   }
   int coNum = getCoNum(id);
   if (coNum == -1) {
-    wsc.sink.add(
-        'error; message: Es gab ein Problem bei der Zuweisung der Kom-Nummer. Bitte melden sie sich bei einem Administrator.');
+    waiting.add({
+      'username': username,
+      'password': password,
+      'name': name,
+      'email': email
+    });
+    wsc.sink.add('error; message: Sie wurden auf die warteliste gesetzt.');
     return;
   }
   User newUser = User(
