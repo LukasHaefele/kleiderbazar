@@ -6,25 +6,25 @@
   height: 100%;
   width: 100%;
   z-index: 5;
-  background-color: #00000099;
+  background-color: rgba(0, 0, 0, 0.6);
 }
 .greyout .panelButton {
   width: 100px;
   height: 20 px;
-  background-color: #D8DAE6ff;
-  border: 2px solid #000000ff;
+  background-color: #d8dae6;
+  border: 2px solid black;
   border-radius: 5px;
   margin: auto;
-  color: #000000ff;
+  color: black;
 }
 .greyout .panIn {
   width: 200px;
   height: 25px;
-  background-color: #D8DAE6ff;
-  border: 2px solid #D8DAE6ff;
+  background-color: #d8dae6;
+  border: 2px solid #d8dae6;
   border-radius: 5px;
   margin: auto;
-  color: #000000ff;
+  color: black;
 }
 
 .panel {
@@ -32,13 +32,14 @@
   flex-direction: column;
   flex-wrap: wrap;
   overflow: scroll;
-  background-color: #E8EAF6ff;
+  background-color: #e8eaf6;
   padding: 5px;
-  border: 2px solid #000000ff;
-  box-shadow: 5px 5px 5px #0000009f;
+  border: 2px solid black;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.6235294118);
   border-radius: 10px;
   text-align: center;
-  color: #000000ff;
+  color: black;
+  overflow: scroll;
 }
 
 .flexrow {

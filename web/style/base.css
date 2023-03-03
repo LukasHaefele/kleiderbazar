@@ -71,6 +71,7 @@
   border-radius: 10px;
   text-align: center;
   color: black;
+  overflow: scroll;
 }
 
 .flexrow {
