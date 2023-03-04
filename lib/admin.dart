@@ -335,13 +335,21 @@ void adminArchiveAll() async {
   //use.writeAsString('[]');
   await File('.data/.dataarchive/$today-waiting.json')
       .writeAsString(await wai.readAsString());
-  await wai.writeAsString('[]');
+  await wai.writeAsString(emptyWaiting());
   await File('.data/coHash.json').writeAsString(clearCoHash());
 
   items = getItems('item');
   allTr = getTr();
   freeUsers();
   stat = getStat();
+}
+
+String emptyWaiting() {
+  List l = [];
+  for (int i = 0; i < 200; i++) {
+    l.add(-1);
+  }
+  return jsonEncode(l);
 }
 
 String clearCoHash() {
