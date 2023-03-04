@@ -243,6 +243,11 @@ void itemModByOne(int id, bool add, bool trash, WebSocketChannel wsc) {
         }
       } else {
         u.ammounts[i.productType]--;
+        if (trash) {
+          i.trashed++;
+        } else {
+          i.sold++;
+        }
         if (i.ammount <= 0) {
           removeItem(i.id, trash, wsc);
         }
