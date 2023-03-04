@@ -177,7 +177,7 @@ void getAction(Map<String, dynamic> request, WebSocketChannel wsc) {
       return;
 
     case ADMIN_DELETE_USER:
-      adminDeleteUser(int.parse(request['id']));
+      adminDeleteUser(int.parse(request['id']), wsc);
       return;
 
     case ADMIN_ARCHIVE_ALL:

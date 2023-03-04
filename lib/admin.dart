@@ -177,7 +177,7 @@ double pao(bool emp) {
 }
 
 String endstring =
-    '\nAnfragen zu vermissten Artikeln unter basarsupport@cvjm-gomaringen.de \nDer nächste Kinderbasar findet am 25.9.22 in der Sport- und Kulturhalle \nGomaringen statt.\n\n';
+    '\nAnfragen zu vermissten bzw. falschen Artikeln unter \nbasarsupport@cvjm-gomaringen.de \nDer nächste Kinderbasar findet am 14.03.23 in der Sport- und Kulturhalle \nGomaringen statt.\nUnser nächster Modebasar findet am 03.02.2024\n im CVJM-Heim statt.\n\n';
 
 ///confirm user accounts
 void adminConfirm(int id, WebSocketChannel wsc) {
@@ -269,19 +269,19 @@ void adminMakeEmp(int id) {
 }
 
 ///deletes User and saves it to deleted
-void adminDeleteUser(int id) {
+void adminDeleteUser(int id, WebSocketChannel wsc) {
   User u = getUserById(id);
   if (u == emptyUser) return;
   u.del = true;
   updateEmailList();
-  coHash[u.conum] = null;
-  //unWaitWaiting();
+  coHash[u.conum] = -1;
+  if (!u.register && !u.admin) unWaitWaiting(wsc);
   saveUsers();
   stat['bareUserNum']--;
   saveStat();
 }
 
-void unWaitWaiting() {
+void unWaitWaiting(WebSocketChannel wsc) {
   if (waiting.isEmpty) return;
   Map m = waiting.removeAt(0);
   int id = getUserId();
@@ -298,12 +298,15 @@ void unWaitWaiting() {
       getCoNum(id),
       false,
       false,
-      false,
+      true,
       false);
   activeUsers.add(newUser);
   saveUsers();
   stat["bareUserNum"]++;
   saveStat();
+  File('.data/waiting.json').writeAsStringSync(jsonEncode(waiting));
+  wsc.sink.add(
+      '$ADMIN_ADD_UNCONFIRMED; id: ${newUser.id}; name: ${newUser.name}; username: ${newUser.username}; email: S${newUser.email}');
 }
 
 ///Archives all files

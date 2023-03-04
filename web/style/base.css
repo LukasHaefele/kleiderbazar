@@ -71,7 +71,21 @@
   border-radius: 10px;
   text-align: center;
   color: black;
+}
+
+#waitListPanel {
+  flex-direction: column;
+  height: 95%;
+}
+
+#waitList {
+  height: 80%;
   overflow: scroll;
+  border: 2px solid black;
+}
+#waitList div {
+  border: 1px solid black;
+  margin-bottom: 2px;
 }
 
 .flexrow {
